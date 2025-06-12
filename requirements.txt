@@ -3,3 +3,4 @@ fastapi
 uvicorn[standard]
 logfire
 typing-extensions 
+markdown
