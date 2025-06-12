@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Structured Output Chat App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    main {
+      max-width: 900px;
+    }
+    #conversation .user::before {
+      content: '👤 You: ';
+      font-weight: bold;
+      display: block;
+      color: #0969da;
+    }
+    #conversation .model::before {
+      content: '🤖 AI: ';
+      font-weight: bold;
+      display: block;
+      color: #d1006f;
+    }
+    #spinner {
+      opacity: 0;
+      transition: opacity 500ms ease-in;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #222;
+      border-bottom-color: transparent;
+      border-radius: 50%;
+      animation: rotation 1s linear infinite;
+    }
+    @keyframes rotation {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #spinner.active {
+      opacity: 1;
+    }
+    
+    /* Structured Data Styling */
+    .structured-data {
+      margin-top: 10px;
+      border: 1px solid #e1e5e9;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+    }
+    
+    .structured-header {
+      background-color: #e9ecef;
+      padding: 10px 15px;
+      border-bottom: 1px solid #e1e5e9;
+      border-radius: 8px 8px 0 0;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .structured-content {
+      padding: 15px;
+    }
+    
+    .task-item {
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background-color: white;
+    }
+    
+    .task-priority {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    .priority-low { background-color: #d4edda; color: #155724; }
+    .priority-medium { background-color: #fff3cd; color: #856404; }
+    .priority-high { background-color: #f8d7da; color: #721c24; }
+    .priority-urgent { background-color: #d1ecf1; color: #0c5460; }
+    
+    .recipe-section {
+      margin-bottom: 20px;
+    }
+    
+    .ingredient-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .weather-card {
+      background: linear-gradient(135deg, #74b9ff, #0984e3);
+      color: white;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    
+    .weather-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .rating-stars {
+      color: #ffc107;
+      margin-right: 10px;
+    }
+    
+    .example-queries {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .example-query {
+      display: inline-block;
+      background-color: #e9ecef;
+      color: #495057;
+      padding: 5px 10px;
+      margin: 3px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background-color 0.2s;
+    }
+    
+    .example-query:hover {
+      background-color: #6c757d;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <i class="fas fa-robot"></i> Structured Output Chat
+      </a>
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" href="/readme" target="_blank">
+          <i class="fas fa-book"></i> README
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="mx-auto my-4 p-4">
+    <div class="example-queries">
+      <h6><i class="fas fa-lightbulb"></i> Try these example queries:</h6>
+      <span class="example-query" data-query="Create a task list for planning a birthday party">🎉 Plan birthday party</span>
+      <span class="example-query" data-query="Give me a recipe for chocolate chip cookies">🍪 Chocolate chip cookies</span>
+      <span class="example-query" data-query="What's the weather like in New York?">🌤️ Weather in NYC</span>
+      <span class="example-query" data-query="Review the iPhone 15 Pro">📱 iPhone 15 Pro review</span>
+      <span class="example-query" data-query="Plan my day for maximum productivity">⚡ Productivity plan</span>
+      <span class="example-query" data-query="Recipe for vegetarian pasta">🍝 Vegetarian pasta</span>
+    </div>
+
+    <div id="conversation" class="mb-4"></div>
+    
+    <div class="d-flex justify-content-center mb-3">
+      <div id="spinner"></div>
+    </div>
+    
+    <form method="post" class="d-flex gap-2">
+      <input id="prompt-input" name="prompt" class="form-control" placeholder="Ask for structured data: tasks, recipes, weather, reviews..." />
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-paper-plane"></i> Send
+      </button>
+    </form>
+    
+    <div id="error" class="d-none alert alert-danger mt-3">
+      <i class="fas fa-exclamation-triangle"></i>
+      Error occurred, check the browser developer console for more information.
+    </div>
+  </main>
+</body>
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typescript/5.6.3/typescript.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="module">
+  async function loadTs() {
+    const response = await fetch('/structured_chat_app.ts');
+    const tsCode = await response.text();
+    const jsCode = window.ts.transpile(tsCode, { target: "es2015" });
+    let script = document.createElement('script');
+    script.type = 'module';
+    script.text = jsCode;
+    document.body.appendChild(script);
+  }
+
+  loadTs().catch((e) => {
+    console.error(e);
+    document.getElementById('error').classList.remove('d-none');
+    document.getElementById('spinner').classList.remove('active');
+  });
+</script> 

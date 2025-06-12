@@ -1,0 +1,7 @@
+pydantic-ai[openai]
+fastapi
+uvicorn[standard]
+logfire
+typing-extensions
+python-dotenv
+markdown 
