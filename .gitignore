@@ -1,2 +1,12 @@
 .env
 __pycache__/
+chat.db
+.env
+.vscode/
+.gitignore
+.git/
+.gitignore
+.git/
+.gitignore
+.git/
+structured-output/structured_chat.db
